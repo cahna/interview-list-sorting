@@ -70,7 +70,7 @@ def iter_split(handle: io.IOBase) -> Iterable[Union[str, int]]:
 
 def gen_split(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
     """Generator-based algorithm.
-    - 1 byte is read from file at a time (requirements specify ASCII only).
+    - Read 1 byte from file at a time (requirements specify ASCII only).
     - Split words by whitespace.
     - Remove ignorable characters using regex replace.
     - Parse input into strings and ints using regex matching.
@@ -104,7 +104,7 @@ def gen_split_2(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
 
     while character := handle.read(1):
         if character in string.whitespace:
-            if current_match:
+            if current_match and current_match != ["-"]:
                 yield parser("".join(current_match))
                 current_match = []
         else:
@@ -131,5 +131,5 @@ def gen_split_2(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
 
     handle.close()
 
-    if current_match:
+    if current_match and current_match != ["-"]:
         yield parser("".join(current_match))
