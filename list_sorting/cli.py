@@ -5,7 +5,11 @@ from typing import List, Mapping, Union
 
 import typer
 
-from .lib import gen_split, gen_split_2, iter_split
+from .lib import (
+    split_generator_read_1_parse_manual,
+    split_generator_read_1_parse_regex,
+    split_iterator_read_all_parse_regex,
+)
 
 
 @unique
@@ -16,9 +20,9 @@ class Algorithm(str, Enum):
 
 
 IMPLEMENTATIONS = {
-    Algorithm.ITERATOR: iter_split,
-    Algorithm.GENERATOR: gen_split,
-    Algorithm.GENERATOR2: gen_split_2,
+    Algorithm.ITERATOR: split_iterator_read_all_parse_regex,
+    Algorithm.GENERATOR: split_generator_read_1_parse_regex,
+    Algorithm.GENERATOR2: split_generator_read_1_parse_manual,
 }
 
 

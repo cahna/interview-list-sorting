@@ -29,11 +29,9 @@ def clean_and_parse_word(word: str) -> Union[str, int]:
     return re.sub(RE_NON_ALPHANUMERIC, "", word)
 
 
-def iter_split(handle: io.IOBase) -> Iterable[Union[str, int]]:
-    """Iterator-based algorithm that loads entire file into a string.
-    - Iterate over words using re.finditer to split on whitespace.
-    - Remove ignorable characters using regex replace.
-    - Parse input into strings and ints using regex matching.
+def split_iterator_read_all_parse_regex(handle: io.IOBase) -> Iterable[Union[str, int]]:
+    """Iterator-based algorithm that loads entire file before using regex iterator to
+    split words. Words are sanitized and parsed by additional regex(es).
     """
 
     class IterSplit:
@@ -67,12 +65,11 @@ def iter_split(handle: io.IOBase) -> Iterable[Union[str, int]]:
     return (s for s in IterSplit(handle))
 
 
-def gen_split(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
-    """Generator-based algorithm.
-    - Read 1 byte from file at a time (requirements specify ASCII only).
-    - Split words by whitespace.
-    - Remove ignorable characters using regex replace.
-    - Parse input into strings and ints using regex matching.
+def split_generator_read_1_parse_regex(
+    handle: io.IOBase,
+) -> Generator[Union[str, int], None, None]:
+    """Generator-based algorithm that loads one character at a time to find
+    words. Once a word is found, regex are used to sanitize and parse the word.
     """
     current_match: List[str] = []
 
@@ -94,7 +91,20 @@ def gen_split(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
     handle.close()
 
 
-def gen_split_2(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
+# def split_generator_read_all_parse_manual(get_text: Callable[[], str]) -> Generator[Union[str, int], None, None]:
+#     """TODO"""
+
+#     def next_char():
+#         for c in handle.read():
+#             yield c
+
+#     return split_generator_read_1_parse_manual(next_char)
+
+
+def split_generator_read_1_parse_manual(
+    # get_next_character: Callable[[], str],
+    handle: io.IOBase,
+) -> Generator[Union[str, int], None, None]:
     """Generator-based algorithm. Splitting and parsing words performed on-the-fly.
     - 1 byte is read from file at a time (requirements specify ASCII only).
     - Split words by whitespace.
