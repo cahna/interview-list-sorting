@@ -17,11 +17,14 @@ def clean_and_parse_word(word: str) -> Union[str, int]:
         capture = m.group(0)
         number_string = re.sub(RE_NOT_A_DIGIT, "", capture)
 
-        return int(number_string) * -1
+        if number_string:
+            return int(number_string) * -1
     elif m := RE_IS_POSITIVE_NUMBER.match(word):
         capture = m.group(0)
         number_string = re.sub(RE_NOT_A_DIGIT, "", capture)
-        return int(number_string)
+
+        if number_string:
+            return int(number_string)
 
     return re.sub(RE_NON_ALPHANUMERIC, "", word)
 
@@ -33,11 +36,42 @@ def iter_split(handle: io.IOBase) -> Iterable[Union[str, int]]:
     - Remove ignorable characters using regex replace.
     - Parse input into strings and ints using regex matching.
     """
-    return (
-        clean_and_parse_word(m.group(0))
-        for m in re.finditer(r"\S+", handle.read())
-        if m.group(0)
-    )
+
+    class IterSplit:
+        def __init__(self, fh: io.IOBase):
+            self.re_iter = re.finditer(r"\S+", fh.read())
+
+        def _get_next_match(self):
+            if match := next(self.re_iter):
+                return match
+
+            raise StopIteration
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            match = self._get_next_match()
+            group = match.group(0).strip()
+
+            while not group:
+                match = self._get_next_match()
+                group = match.group(0).strip()
+
+            word = clean_and_parse_word(group)
+
+            if word:
+                return word
+
+            return self.__next__()
+
+    return (s for s in IterSplit(handle))
+
+    # return (
+    #     clean_and_parse_word(m.group(0))
+    #     for m in re.finditer(r"\S+", handle.read())
+    #     if m.group(0)
+    # )
 
 
 def gen_split(handle: io.IOBase) -> Generator[Union[str, int], None, None]:

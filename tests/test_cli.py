@@ -1,6 +1,6 @@
 import pytest
 
-from .data import TEST_DATA
+from .data import TEST_DATA, TEST_DATA_RANDOM
 
 
 def test_help(cli_invoke):
@@ -10,7 +10,7 @@ def test_help(cli_invoke):
 
 
 @pytest.mark.parametrize("algorithm", ["iterator", "generator", "generator2"])
-@pytest.mark.parametrize("text_input, expected_output", TEST_DATA)
+@pytest.mark.parametrize("text_input, expected_output", TEST_DATA + TEST_DATA_RANDOM)
 def test_algorithm(
     algorithm: str, text_input: str, expected_output: str, cli_invoke, tmp_path
 ):

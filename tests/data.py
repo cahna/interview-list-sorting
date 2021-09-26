@@ -1,8 +1,13 @@
+import random
 import string
 from typing import List, Tuple
 
+"""
+Static test data as tuples of (input_text, expected_text)
+"""
 TEST_DATA: List[Tuple[str, str]] = [
-    *[(s, "\n") for s in string.whitespace],
+    *[(s, "\n") for s in string.whitespace + string.punctuation],
+    ("999999 -999999", "-999999 999999\n"),
     ("apple orange banana\n", "apple banana orange\n"),
     ("1 10 3 8 5\n", "1 3 5 8 10\n"),
     ("-1 -10 -3 -8 -5\n", "-10 -8 -5 -3 -1\n"),
@@ -13,4 +18,19 @@ TEST_DATA: List[Tuple[str, str]] = [
     ("-a -b -c -1 -2 -3", "a b c -3 -2 -1\n"),
     ("-a- -b- -c- -1- -2- -3-", "a b c -3 -2 -1\n"),
     ("--a1-- ---b2--- -c-3- --1- -2-- --3--", "a1 b2 c3 -3 -2 -1\n"),
+    ("a man a pl4n a ca-nal, panama", "a a a canal man panama pl4n\n"),
+    ("%", "\n"),
+    ("  $ $ $ $ ", "\n"),
+    ("-", "\n"),
+]
+
+"""
+Fuzzing test data
+"""
+TEST_DATA_RANDOM: List[Tuple[str, str]] = [
+    ("".join((random.choices(string.whitespace + string.punctuation, k=100))), "\n"),
+    (
+        "a".join((random.choices(string.punctuation, k=100))),
+        "a" * 99 + "\n",
+    ),
 ]
