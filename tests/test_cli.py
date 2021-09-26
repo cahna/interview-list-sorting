@@ -9,7 +9,9 @@ def test_help(cli_invoke):
     assert result.stdout.startswith("Usage: listSorting")
 
 
-@pytest.mark.parametrize("algorithm", ["iterator", "generator", "generator2"])
+@pytest.mark.parametrize(
+    "algorithm", ["iterator", "generator", "generator2", "generator3"]
+)
 @pytest.mark.parametrize("text_input, expected_output", TEST_DATA + TEST_DATA_RANDOM)
 def test_algorithm(
     algorithm: str, text_input: str, expected_output: str, cli_invoke, tmp_path

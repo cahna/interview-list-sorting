@@ -1,4 +1,3 @@
-import io
 import re
 import string
 from typing import Callable, Generator, Iterable, List, Union
@@ -29,14 +28,16 @@ def clean_and_parse_word(word: str) -> Union[str, int]:
     return re.sub(RE_NON_ALPHANUMERIC, "", word)
 
 
-def split_iterator_read_all_parse_regex(handle: io.IOBase) -> Iterable[Union[str, int]]:
+def split_iterator_read_all_parse_regex(
+    get_text: Callable[[], str]
+) -> Iterable[Union[str, int]]:
     """Iterator-based algorithm that loads entire file before using regex iterator to
     split words. Words are sanitized and parsed by additional regex(es).
     """
 
     class IterSplit:
-        def __init__(self, fh: io.IOBase):
-            self.re_iter = re.finditer(r"\S+", fh.read())
+        def __init__(self, read_all: Callable[[], str]):
+            self.re_iter = re.finditer(r"\S+", read_all())
 
         def _get_next_match(self):
             if match := next(self.re_iter):
@@ -62,18 +63,18 @@ def split_iterator_read_all_parse_regex(handle: io.IOBase) -> Iterable[Union[str
 
             return self.__next__()
 
-    return (s for s in IterSplit(handle))
+    return (s for s in IterSplit(get_text))
 
 
 def split_generator_read_1_parse_regex(
-    handle: io.IOBase,
+    get_next_character: Callable[[], str]
 ) -> Generator[Union[str, int], None, None]:
     """Generator-based algorithm that loads one character at a time to find
     words. Once a word is found, regex are used to sanitize and parse the word.
     """
     current_match: List[str] = []
 
-    while character := handle.read(1):
+    while character := get_next_character():
         if character in string.whitespace:
             if current_match:
                 word = clean_and_parse_word("".join(current_match))
@@ -88,32 +89,19 @@ def split_generator_read_1_parse_regex(
         if word == 0 or word:
             yield word
 
-    handle.close()
-
-
-# def split_generator_read_all_parse_manual(get_text: Callable[[], str]) -> Generator[Union[str, int], None, None]:
-#     """TODO"""
-
-#     def next_char():
-#         for c in handle.read():
-#             yield c
-
-#     return split_generator_read_1_parse_manual(next_char)
-
 
 def split_generator_read_1_parse_manual(
-    # get_next_character: Callable[[], str],
-    handle: io.IOBase,
+    get_next_character: Callable[[], str],
 ) -> Generator[Union[str, int], None, None]:
-    """Generator-based algorithm. Splitting and parsing words performed on-the-fly.
-    - 1 byte is read from file at a time (requirements specify ASCII only).
-    - Split words by whitespace.
-    - Remove bad characters and parse numbers, as appropriate.
+    """Generator-based algorithm that scans one character at a time to find
+    and sanitize words. The type of the word is inferred during scanning.
+
+    Hypothesis: this is the best algorithm for time/space.
     """
     current_match: List[str] = []
     parser: Callable[[str], Union[str, int]] = str
 
-    while character := handle.read(1):
+    while character := get_next_character():
         if character in string.whitespace:
             if current_match and current_match != ["-"]:
                 yield parser("".join(current_match))
@@ -140,7 +128,24 @@ def split_generator_read_1_parse_manual(
 
             current_match.append(character)
 
-    handle.close()
-
     if current_match and current_match != ["-"]:
         yield parser("".join(current_match))
+
+
+def split_generator_read_all_parse_manual(
+    get_text: Callable[[], str]
+) -> Generator[Union[str, int], None, None]:
+    """TODO"""
+    text = get_text()
+    text_len = len(text)
+    i = 0
+
+    def next_char():
+        nonlocal i
+        if i < text_len:
+            c = text[i]
+            i += 1
+            return c
+        return None
+
+    return split_generator_read_1_parse_manual(next_char)
