@@ -18,7 +18,7 @@ TEST_DATA: List[Tuple[str, str]] = [
     ("-a -b -c -1 -2 -3", "a b c -3 -2 -1\n"),
     ("-a- -b- -c- -1- -2- -3-", "a b c -3 -2 -1\n"),
     ("--a1-- ---b2--- -c-3- --1- -2-- --3--", "a1 b2 c3 -3 -2 -1\n"),
-    ("a man a pl4n a ca-nal, panama", "a a a canal man panama pl4n\n"),
+    ("a man, a plan, a canal: panama", "a a a canal man panama plan\n"),
     ("%", "\n"),
     ("  $ $ $ $ ", "\n"),
     ("-", "\n"),

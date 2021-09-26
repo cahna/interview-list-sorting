@@ -31,7 +31,7 @@ def clean_and_parse_word(word: str) -> Union[str, int]:
 
 def iter_split(handle: io.IOBase) -> Iterable[Union[str, int]]:
     """Iterator-based algorithm.
-    - Load entire text file as a string.
+    - Load entire text file as a string. Likely so struggle with large files.
     - Iterate over words using re.finditer to split on whitespace.
     - Remove ignorable characters using regex replace.
     - Parse input into strings and ints using regex matching.
@@ -67,12 +67,6 @@ def iter_split(handle: io.IOBase) -> Iterable[Union[str, int]]:
 
     return (s for s in IterSplit(handle))
 
-    # return (
-    #     clean_and_parse_word(m.group(0))
-    #     for m in re.finditer(r"\S+", handle.read())
-    #     if m.group(0)
-    # )
-
 
 def gen_split(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
     """Generator-based algorithm.
@@ -86,13 +80,15 @@ def gen_split(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
     while character := handle.read(1):
         if character in string.whitespace:
             if current_match:
-                yield clean_and_parse_word("".join(current_match))
+                if word := clean_and_parse_word("".join(current_match)):
+                    yield word
                 current_match = []
         else:
             current_match.append(character)
 
     if current_match:
-        yield clean_and_parse_word("".join(current_match))
+        if word := clean_and_parse_word("".join(current_match)):
+            yield word
 
     handle.close()
 
