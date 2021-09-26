@@ -1,0 +1,16 @@
+import string
+from typing import List, Tuple
+
+TEST_DATA: List[Tuple[str, str]] = [
+    *[(s, "\n") for s in string.whitespace],
+    ("apple orange banana\n", "apple banana orange\n"),
+    ("1 10 3 8 5\n", "1 3 5 8 10\n"),
+    ("-1 -10 -3 -8 -5\n", "-10 -8 -5 -3 -1\n"),
+    ("car 10 truck 4 2 bus\n", "bus 2 car 4 10 truck\n"),
+    ("20 cat bi?rd 12 do@g\n", "12 bird cat 20 dog\n"),
+    ("-20 -cat bi?rd 12 do@g\n", "-20 bird cat 12 dog\n"),
+    ("a b c 1 2 3", "a b c 1 2 3\n"),
+    ("-a -b -c -1 -2 -3", "a b c -3 -2 -1\n"),
+    ("-a- -b- -c- -1- -2- -3-", "a b c -3 -2 -1\n"),
+    ("--a1-- ---b2--- -c-3- --1- -2-- --3--", "a1 b2 c3 -3 -2 -1\n"),
+]

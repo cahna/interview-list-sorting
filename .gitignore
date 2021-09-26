@@ -1,7 +1,9 @@
 # Python
-venv/
-.mypy_cache/
+venv
+.mypy_cache
+.pytest_cache
 **/__pycache__
+.vscode/.ropeproject
 
 # Misc files
 *.out

@@ -1,15 +1,11 @@
 import heapq
-import re
-import string
 import sys
-from collections import defaultdict
 from enum import Enum, unique
-from pathlib import Path
-from typing import Dict, List, Mapping, Optional, Union
+from typing import List, Mapping, Union
 
 import typer
 
-from list_sorting.lib import gen_split, gen_split_2, iter_split
+from .lib import gen_split, gen_split_2, iter_split
 
 
 @unique
@@ -37,7 +33,7 @@ def list_sorting(
     # Keep track of the order in which strings and ints appear in the input
     type_order = []
 
-    # O(1) insertion of elements into heap, leveraging the invariant and heapsort for performance
+    # O(1) insert into heap, leveraging the invariant and heapsort for performance
     type_heaps: Mapping[type, List[Union[int, str]]] = {str: [], int: []}
 
     for match in implementation(input_file):
@@ -46,12 +42,12 @@ def list_sorting(
 
     for i in range(len(type_order)):
         type_ = type_order[i]
-        output_file.write(str(heapq.heappop(type_heaps[type_])))
+        typer.echo(str(heapq.heappop(type_heaps[type_])), nl=False, file=output_file)
         if i < len(type_order) - 1:
-            output_file.write(" ")
+            typer.echo(" ", nl=False, file=output_file)
 
     # All examples end with newline
-    output_file.write("\n")
+    typer.echo("\n", nl=False, file=output_file)
 
 
 def cli():
