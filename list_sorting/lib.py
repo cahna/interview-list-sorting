@@ -30,8 +30,7 @@ def clean_and_parse_word(word: str) -> Union[str, int]:
 
 
 def iter_split(handle: io.IOBase) -> Iterable[Union[str, int]]:
-    """Iterator-based algorithm.
-    - Load entire text file as a string. Likely so struggle with large files.
+    """Iterator-based algorithm that loads entire file into a string.
     - Iterate over words using re.finditer to split on whitespace.
     - Remove ignorable characters using regex replace.
     - Parse input into strings and ints using regex matching.
@@ -60,7 +59,7 @@ def iter_split(handle: io.IOBase) -> Iterable[Union[str, int]]:
 
             word = clean_and_parse_word(group)
 
-            if word:
+            if word == 0 or word:
                 return word
 
             return self.__next__()
@@ -80,24 +79,26 @@ def gen_split(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
     while character := handle.read(1):
         if character in string.whitespace:
             if current_match:
-                if word := clean_and_parse_word("".join(current_match)):
+                word = clean_and_parse_word("".join(current_match))
+                if word == 0 or word:
                     yield word
                 current_match = []
         else:
             current_match.append(character)
 
     if current_match:
-        if word := clean_and_parse_word("".join(current_match)):
+        word = clean_and_parse_word("".join(current_match))
+        if word == 0 or word:
             yield word
 
     handle.close()
 
 
 def gen_split_2(handle: io.IOBase) -> Generator[Union[str, int], None, None]:
-    """Generator-based algorithm.
+    """Generator-based algorithm. Splitting and parsing words performed on-the-fly.
     - 1 byte is read from file at a time (requirements specify ASCII only).
     - Split words by whitespace.
-    - Remove bad characters and determine appropriate parsing on-the-fly.
+    - Remove bad characters and parse numbers, as appropriate.
     """
     current_match: List[str] = []
     parser: Callable[[str], Union[str, int]] = str

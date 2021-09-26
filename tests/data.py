@@ -2,6 +2,12 @@ import random
 import string
 from typing import List, Tuple
 
+# MIN_INT = -999999
+# MAX_INT = 999999
+MIN_INT = -9
+MAX_INT = 9
+INT_RANGE = range(MIN_INT, MAX_INT + 1)
+
 """
 Static test data as tuples of (input_text, expected_text)
 """
@@ -32,5 +38,11 @@ TEST_DATA_RANDOM: List[Tuple[str, str]] = [
     (
         "a".join((random.choices(string.punctuation, k=100))),
         "a" * 99 + "\n",
+    ),
+    (
+        (" " * random.randint(1, 10)).join(
+            map(str, random.sample(INT_RANGE, k=len(INT_RANGE)))
+        ),
+        " ".join(map(str, INT_RANGE)) + "\n",
     ),
 ]
