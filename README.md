@@ -27,3 +27,12 @@ listSorting input3.txt output3.txt
 ```sh
 listSorting < input4.txt
 ```
+
+## Profiling
+
+`profile_all.sh` is provided to run some basic time and memory profiling
+against all 4 algorithms. Example:
+
+```sh
+./profile_all.sh example1.txt
+```
