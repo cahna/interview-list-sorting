@@ -6,7 +6,7 @@ from typing import List, Mapping, Union
 
 import typer
 
-from .lib import (
+from list_sorting.lib import (
     split_generator_read_1_parse_manual,
     split_generator_read_1_parse_regex,
     split_generator_read_all_parse_manual,
@@ -42,26 +42,34 @@ def list_sorting(
         1 if algorithm in [Algorithm.GENERATOR, Algorithm.GENERATOR3] else -1,
     )
 
-    # Keep track of the order in which strings and ints appear in the input
-    type_order = []
+    # @profile  # Uncomment before running mprof
+    def main():
+        """Only purpose of main() is to provide a function for mprof to profile"""
 
-    # O(1) insert into heap, leveraging the invariant and heapsort for performance
-    type_heaps: Mapping[type, List[Union[int, str]]] = {str: [], int: []}
+        # Keep track of the order in which strings and ints appear in the input
+        type_order = []
 
-    for match in implementation(read_fn):
-        type_order.append(type(match))
-        heapq.heappush(type_heaps[type(match)], match)
+        # O(1) insert into heap, leveraging the invariant and heapsort for performance
+        type_heaps: Mapping[type, List[Union[int, str]]] = {str: [], int: []}
 
-    input_file.close()
+        for match in implementation(read_fn):
+            type_order.append(type(match))
+            heapq.heappush(type_heaps[type(match)], match)
 
-    for i in range(len(type_order)):
-        type_ = type_order[i]
-        typer.echo(str(heapq.heappop(type_heaps[type_])), nl=False, file=output_file)
-        if i < len(type_order) - 1:
-            typer.echo(" ", nl=False, file=output_file)
+        input_file.close()
 
-    # All examples end with newline
-    typer.echo("\n", nl=False, file=output_file)
+        for i in range(len(type_order)):
+            type_ = type_order[i]
+            typer.echo(
+                str(heapq.heappop(type_heaps[type_])), nl=False, file=output_file
+            )
+            if i < len(type_order) - 1:
+                typer.echo(" ", nl=False, file=output_file)
+
+        # All examples end with newline
+        typer.echo("\n", nl=False, file=output_file)
+
+    main()
 
 
 def cli():

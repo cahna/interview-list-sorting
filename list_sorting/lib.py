@@ -28,6 +28,7 @@ def clean_and_parse_word(word: str) -> Union[str, int]:
     return re.sub(RE_NON_ALPHANUMERIC, "", word)
 
 
+# @profile  # Uncomment before running mprof
 def split_iterator_read_all_parse_regex(
     get_text: Callable[[], str]
 ) -> Iterable[Union[str, int]]:
@@ -66,6 +67,7 @@ def split_iterator_read_all_parse_regex(
     return (s for s in IterSplit(get_text))
 
 
+# @profile  # Uncomment before running mprof
 def split_generator_read_1_parse_regex(
     get_next_character: Callable[[], str]
 ) -> Generator[Union[str, int], None, None]:
@@ -90,6 +92,7 @@ def split_generator_read_1_parse_regex(
             yield word
 
 
+# @profile  # Uncomment before running mprof
 def split_generator_read_1_parse_manual(
     get_next_character: Callable[[], str],
 ) -> Generator[Union[str, int], None, None]:
@@ -132,10 +135,9 @@ def split_generator_read_1_parse_manual(
         yield parser("".join(current_match))
 
 
-def split_generator_read_all_parse_manual(
-    get_text: Callable[[], str]
-) -> Generator[Union[str, int], None, None]:
-    """TODO"""
+# @profile  # Uncomment before running mprof
+def split_generator_read_all_parse_manual(get_text: Callable[[], str]):
+    """Read all of text file, then pass each character to split_generator_read_1_parse_manual"""
     text = get_text()
     text_len = len(text)
     i = 0

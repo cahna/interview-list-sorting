@@ -12,3 +12,9 @@ venv
 *.pdf
 *.log
 *.swp
+*.dat
+*.png
+*.prof
+
+# Test data
+examples/
