@@ -1,0 +1,74 @@
+# Analysis
+
+The core of the implementation consists of two parts:
+  1. A tokenization, sanitization, and parsing engine (henceforth referred to
+     as the "parsing engine")
+  2. Data structures to track the stream of words while they are being parsed:
+    - A list to keep track of the order of word types (string vs int)
+    - Two heaps, one for integers and one for strings
+
+## Parsing Engine
+
+For fun and out of my personal curiosity, I have included four implementations
+of the parsing engine. The default implementation is the one I hypotesize is
+most optimal across inputs of any size or complexity, but I have included
+profiling tools and results to test this hypothesis.
+
+### Default (`generator3`)
+
+```
+list_sorting/lib.py:split_generator_read_1_parse_manual
+```
+
+The default implementation (referred to as `generator3`), reads one character
+at a time from the input file and "manually" performs tokenization,
+sanitization, and integer parsing -- when appropriate.
+
+The runtime complexity of parsing algorithm is O(N), where N is the size of
+the input file (in bytes).
+
+### Additional (`iterator`, `generator`, `generator2`)
+
+- `iterator`: this implementation loads the entire file before using regular
+              expressions to tokenize words and another one or more regular
+              expressions to both sanitize undesired characters and toparse
+              the words into strings or integers, as appropriate. Written as
+              a Python iterator.
+- `generator`: reads one character at a time from the input searching for
+               whitespace that delimit potential words. Once a potential word
+               has been parsed, it uses the same regular expressions as
+               `iterator` to sanitize and parse the words. Written as a Python
+               generator function.
+- `generator2`: this is the same underlying algorithm as `generator3`, but the
+                entire file is read at once before passing individual
+                characters from the input string to `generator3` for processing.
+
+## Data structures
+
+The list used to track the order of parsed word types is iterated over to
+determine the output order of sorted words/integers. Instead of using a list
+and iterating over the list, a queue could be used. The use of a queue would
+not reduce the amount of memory needed to store the order of word types, but
+dequeueing the types when producing output could free memory faster than the
+list, depending on garbage collection behavior.
+
+The two heaps are used to keep track of parsed strings and integers. When a
+word of a corresponding type is detected, it is pushed into the appropriate
+heap (taking advantage of O(1) insertion). Both heaps are min-heaps.
+
+Once the input has been fully consumed, the list of types is used to determine
+which heap should be popped to provide the next output. Repetitive popping from
+a min-heap is equivalent to heapsort. Thus, producing the desired output
+involves additional time complexity of O(N*log(N)).
+
+## Additional Thoughts
+
+As an interesting exercise, the parsing and sorting implementations to use
+for a given input heavily depend on the size of the input and the number of
+non-alphanumeric characters that need to be sanitized.
+
+Heapsort is an "OK" implementation for most average cases, but because much
+faster sorting algorithms exist, there may be cases where -- for example --
+performing timsort on an unordered array of parsed words may perform faster
+than popping from a min-heap. The desired use cases and expected inputs would
+give better insights to which implementation should be chosen.
